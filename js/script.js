@@ -232,31 +232,53 @@ window.addEventListener('DOMContentLoaded', function () {
             statusMessage.style.cssText = `display: block; margin: 0 auto;`;
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
+            // const request = new XMLHttpRequest();
+            // request.open('POST', 'server.php');
 
-            // request.setRequestHeader('Content-type', 'multipart/form-data');
-            request.setRequestHeader('Content-type', 'application/json');
+            // // request.setRequestHeader('Content-type', 'multipart/form-data');
+            // request.setRequestHeader('Content-type', 'application/json');
             const formData = new FormData(form);
+
+            // const obj = {};
+            // formData.forEach(function (value, key) {
+            //     obj[key] = value;
+            // });
+            // const json = JSON.stringify(obj);
 
             const obj = {};
             formData.forEach(function (value, key) {
                 obj[key] = value;
             });
-            const json = JSON.stringify(obj);
 
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
+            fetch('server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(obj)
+            }).then(data => data.text())
+                .then(data => {
+                    console.log(data);
                     showThanksModal(message.success);
-                    form.reset();
                     statusMessage.remove();
-                } else {
+                }).catch(() => {
                     showThanksModal(message.failure);
-                }
-            });
+                }).finally(() => {
+                    form.reset();
+                });
+
+            // request.send(json);
+
+            // request.addEventListener('load', () => {
+            //     if (request.status === 200) {
+            //         console.log(request.response);
+            //         showThanksModal(message.success);
+            //         form.reset();
+            //         statusMessage.remove();
+            //     } else {
+            //         showThanksModal(message.failure);
+            //     }
+            // });
         });
     };
 
@@ -284,4 +306,17 @@ window.addEventListener('DOMContentLoaded', function () {
             closeModal();
         }, 4000);
     };
+
+
+    //  fetch()  API
+
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: 'POST',
+    //     body: JSON.stringify({ name: 'ALex' }),
+    //     headers: {
+    //         'Content-type': 'application/json'
+    //     }
+    // })
+    //     .then(response => response.json())
+    //     .then(json => console.log(json));
 });
