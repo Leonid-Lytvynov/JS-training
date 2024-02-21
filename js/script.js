@@ -367,7 +367,8 @@ window.addEventListener('DOMContentLoaded', function () {
     // Slider
 
     const slides = document.querySelectorAll('.offer__slide'),
-        next = document.querySelector('.offer__slider-next'),
+        slider = document.querySelector('.offer__slider')
+    next = document.querySelector('.offer__slider-next'),
         prev = document.querySelector('.offer__slider-prev'),
         total = document.querySelector('#total'),
         current = document.querySelector('#current');
@@ -385,11 +386,7 @@ window.addEventListener('DOMContentLoaded', function () {
         current.textContent = slideIndex;
     }
 
-    if (slides.length < 10) {
-        total.textContent = `0${slides.length}`;
-    } else {
-        total.textContent = slides.length;
-    }
+    setCurrNum();
 
     //  First version
 
@@ -442,7 +439,27 @@ window.addEventListener('DOMContentLoaded', function () {
 
     slides.forEach(item => {
         item.style.width = width
-    })
+    });
+
+
+    slider.style.position = 'relative';
+
+    const indicators = document.createElement('ol'),
+        dots = [];
+
+    indicators.classList.add('carousel-indicators');
+    slider.append(indicators);
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.classList.add('dot');
+
+        if (i == 0) {
+            dot.classList.add('dot-active')
+        }
+        indicators.append(dot);
+        dots.push(dot)
+    }
 
     next.addEventListener('click', () => {
         if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
@@ -458,11 +475,9 @@ window.addEventListener('DOMContentLoaded', function () {
             slideIndex++;
         }
 
-        if (slideIndex < 10) {
-            current.textContent = `0${slideIndex}`;
-        } else {
-            current.textContent = slideIndex;
-        }
+        setCurrNum();
+
+        activeDot();
     })
 
     prev.addEventListener('click', () => {
@@ -479,10 +494,36 @@ window.addEventListener('DOMContentLoaded', function () {
             slideIndex--;
         }
 
+        setCurrNum();
+
+        activeDot();
+    })
+
+    dots.forEach(item => {
+        item.addEventListener('click', (e) => {
+            const slideTo = e.target.getAttribute('data-slide-to');
+
+            slideIndex = slideTo;
+            offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+
+            slidesField.style.transform = `translateX(-${offset}px)`;
+
+            setCurrNum();
+
+            activeDot();
+        })
+    })
+
+    function setCurrNum() {
         if (slideIndex < 10) {
             current.textContent = `0${slideIndex}`;
         } else {
             current.textContent = slideIndex;
         }
-    })
+    }
+
+    function activeDot() {
+        dots.forEach(item => item.classList.remove('dot-active'));
+        dots[slideIndex - 1].classList.add('dot-active');
+    }
 });
